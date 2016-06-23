@@ -240,6 +240,8 @@ sub process-pod-source(:$kind, :$pod, :$filename, :$pod-is-complete) {
         note "$filename does not have a =SUBTITLE";
     }
 
+    my $escaped-filename = english-for-tokens($filename);
+    my $path = "/$kind/$escaped-filename";
     my %type-info;
     if $kind eq "type" {
         if $type-graph.types{$name} -> $type {
@@ -254,19 +256,19 @@ sub process-pod-source(:$kind, :$pod, :$filename, :$pod-is-complete) {
         :$kind,
         :$name,
         :$pod,
-        :url("/$kind/$filename"),
+        :url($path),
         :$summary,
         :$pod-is-complete,
         :subkinds($kind),
         |%type-info,
     );
 
-    find-definitions :$pod, :$origin, :url("/$kind/$filename");
-    find-references  :$pod, :$origin, :url("/$kind/$filename");
+    find-definitions :$pod, :$origin, :url($path);
+    find-references  :$pod, :$origin, :url($path);
 
     # Special handling for 5to6-perlfunc
     if $filename eq '5to6-perlfunc' {
-      find-p5to6-functions(:$pod, :$origin, :url("/$kind/$filename"));
+      find-p5to6-functions(:$pod, :$origin, :url($path));
     }
 }
 
@@ -274,7 +276,7 @@ sub process-pod-source(:$kind, :$pod, :$filename, :$pod-is-complete) {
 multi write-type-source($doc) {
     sub href_escape($ref) {
         # only valid for things preceded by a protocol, slash, or hash
-        return uri_escape($ref).subst('%3A%3A', '::', :g);
+        return uri_escape(english-for-tokens($ref)).subst('%3A%3A', '::', :g);
     }
     my $pod     = $doc.pod;
     my $podname = $doc.name;
@@ -662,7 +664,7 @@ sub write-search-file() {
     say 'Writing html/js/search.js ...';
     my $template = slurp("template/search_template.js");
     sub escape(Str $s) {
-        $s.trans([</ \\ ">] => [<\\/ \\\\ \\">]);
+        $s.subst('"', '\"', :g);
     }
     my @items = $*DR.get-kinds.map(-> $kind {
         $*DR.lookup($kind, :by<kind>).categorize({escape .name})\
@@ -723,7 +725,7 @@ sub write-disambiguation-files() {
                 });
         }
         my $html = p2h($pod, 'routine');
-        spurt "html/$name.subst(/<[/\\]>/,'_',:g).html", $html;
+        spurt "html/"~english-for-tokens($name)~".html", $html;
     }
     say '';
 }
@@ -840,7 +842,8 @@ sub write-kind($kind) {
                 })
             );
             print '.';
-            spurt "html/$kind/$name.subst(/<[/\\]>/,'_',:g).html", p2h($pod, $kind);
+            my $english-name = english-for-tokens $name;
+            spurt "html/$kind/$english-name.html", p2h($pod, $kind);
         }
     say '';
 }
@@ -852,7 +855,8 @@ sub write-qualified-method-call(:$name!, :$pod!, :$type!) {
         @$pod,
     );
     return if $name ~~ / '/' /;
-    spurt "html/routine/{$type}.{$name}.html", p2h($p, 'routine');
+    my $english-name = english-for-tokens $name;
+    spurt "html/routine/{$type}.{$english-name}.html", p2h($p, 'routine');
 }
 
 sub highlight-code-blocks(:$use-inline-python = True) {

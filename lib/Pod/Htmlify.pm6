@@ -2,14 +2,63 @@ unit module Pod::Htmlify;
 
 use URI::Escape;
 
+my %tm = q:w!
+    < langle
+    > rangle
+    & amp
+    % percent
+    # hash
+    - dash
+    . dot
+    ? question
+    / slash
+    \ blackslash
+    " quote
+    { lcurly
+    } rcurly
+    [ lbracket
+    ] rbracket
+    | pipe
+    ^ caret
+!;
+sub english-for-tokens is export {
+  $^a.comb.map({ %tm{$_} ?? "-%tm{$_}-" !! $_ })
+     .join.subst(/'--'/, '-', :g)
+     .subst: /^\-|\-<before \s>|<after \s>\-|\-$/, '', :g
+};
+
 #| Escape special characters in URLs if necessary
 sub url-munge($_) is export {
     return $_ if m{^ <[a..z]>+ '://'};
-    return "/type/{uri_escape $_}" if m/^<[A..Z]>/;
-    return "/routine/{uri_escape $_}" if m/^<[a..z]>|^<-alpha>*$/;
+    # this needs to do some magic unescaping
+    # right now it ends up eating its own tail.
+    #
+    # it needs to cut off /type/ | /routine/
+    # it needs to un-percent-escape
+    # it needs to english-for-tokens
+    # it needs to re-percent-escape
+    if (m!^<[#]>(.*)!) {
+        my $hash = $0;
+        $hash = '#' ~ english-for-tokens $hash;
+        return $hash;
+    }
+    if (m!(\/<-[/]>*\/)(<-[#]>*)[<[#]>(.*) || '']!) {
+        my $base = $0;
+        my $tail = $1;
+        my $hash = $2;
+        $tail = uri_unescape $tail;
+        $tail = english-for-tokens $tail;
+        $hash = $hash ?? '#' ~ english-for-tokens $hash !! '';
+        my $r = $base ~ $tail ~ $hash;
+        return $r;
+    }
+    my $escaped = uri_escape (english-for-tokens $_);
+    return "/type/$escaped" if m/^<[A..Z]>/;
+    return "/routine/$escaped" if m/^<[a..z]>|^<-alpha>*$/;
     # poor man's <identifier>
     if m/ ^ '&'( \w <[[\w'-]>* ) $/ {
-        return "/routine/{uri_escape $0}";
+        $escaped = uri_escape (english-for-tokens $0);
+        return "/routine/$escaped";
     }
     return $_;
 }
