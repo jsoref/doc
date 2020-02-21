@@ -48,4 +48,5 @@ SUMS$
 \.yml$
 \.zip$
 ^excludes\.txt$
+^resources/i18n/
 ^whitelist\.txt$
