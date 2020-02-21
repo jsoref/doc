@@ -47,6 +47,7 @@ SUMS$
 \.xpm$
 \.yml$
 \.zip$
+^assets/js/jquery\.tablesorter\.js$
 ^excludes\.txt$
 ^resources/i18n/
 ^whitelist\.txt$
