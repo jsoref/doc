@@ -1,0 +1,52 @@
+=begin pod :kind("Language") :subkind("Language") :category("tutorial")
+
+=TITLE Module development utilities
+
+=SUBTITLE What can help you write/test/improve your module(s)
+
+Here is a list of modules that you can find in the Raku ecosystem
+which aim to make the experience of developing Raku modules
+more fun.
+
+
+=head1 Module builder and authoring tools
+
+Some modules and tools to help you with generating files that are part
+of a module distribution.
+
+=item L<App::Assixt|https://modules.raku.org/dist/App::Assixt> The module developer's assistant
+=item L<App::Mi6|https://modules.raku.org/dist/App::Mi6>     Minimal authoring tool for Raku
+=item L<META6|https://modules.raku.org/dist/META6>        Do things with
+Raku C<META> files
+=item L<Module::Skeleton|https://bitbucket.org/rightfold/module-skeleton>        Generate a skeleton module
+=item L<p6doc|https://modules.raku.org/dist/p6doc>        Generate documentation end-products
+
+
+=head1 Tests
+
+Some tests of module quality.
+
+=item L<Test::META|https://modules.raku.org/dist/Test::META>      Test your META6.json file
+=item L<Test::Output|https://modules.raku.org/dist/Test::Output>  Test the output to STDOUT and STDERR your program generates
+=item L<Test::Screen|https://modules.raku.org/dist/Proc::Screen>  Use B<GNU screen> to test full screen VT applications
+=item L<Test::When|https://modules.raku.org/dist/Test::When>  Control when your tests are run (author testing, online testing, etc.)
+
+=head1 NativeCall
+
+Here some modules to help you work with NativeCall.
+
+=item L<NativeHelpers::Array|https://modules.raku.org/dist/NativeHelpers::Array>  Provides routines to deal with CArray
+=item L<App::GPTrixie|https://modules.raku.org/dist/App::GPTrixie>                Generate NativeCall code from C headers file
+=item L<NativeCall::TypeDiag|https://modules.raku.org/dist/NativeCall::TypeDiag>  Provides routines to test your CStruct
+
+
+=head1 Sample modules
+
+Modules that exist only as minimalist examples, tests for installers,
+or skeletons.
+
+=item L<Foo|https://modules.raku.org/dist/Foo> A module with two distributions of different versions
+
+=end pod
+
+# vim: expandtab softtabstop=4 shiftwidth=4 ft=perl6
