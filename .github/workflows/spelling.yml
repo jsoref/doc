@@ -14,4 +14,5 @@ jobs:
     - uses: check-spelling/check-spelling@0.0.5-alpha
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        bucket: ssh://git@github.com/jsoref/perl6-doc.git
         project: spelling-data
